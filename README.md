@@ -64,6 +64,9 @@ Backlog levels were customized to align with **business initiatives** and provid
 ![Backlog Levels](https://github.com/user-attachments/assets/d44b048b-94c4-4e5a-ae98-4442f2827586)  
 
 ---
+## Application dashboard
+<img width="1919" height="905" alt="image" src="https://github.com/user-attachments/assets/97a44f17-b2c9-4fa5-bdfc-b71914e72aa2" />
+
 
 
 ## Key Highlights  
