@@ -29,18 +29,18 @@ export const constantRouterMap = [
     children: [{
       path: 'home',
       name: 'home',
-      component: () => import('@/views/home/index'),
+      component: () => import('@/views/dashboard/index'),
       meta: {title: 'Dashboard', icon: 'dashboard'}
     },
     {
-      name: 'document',
-      path: 'https://www.macrozheng.com',
-      meta: {title: 'Learning Tutorial', icon: 'document'}
+      name: 'Sales Managmeent',
+      path: '/sales',
+      meta: {title: 'Coming Soon!', icon: 'document'}
     },
     {
-      name: 'video',
-      path: 'https://www.macrozheng.com/mall/foreword/mall_video.html',
-      meta: {title: 'Video Tutorial', icon: 'video'}
+      name: 'Github',
+      path: 'https://github.com/DarshanParbadiya',
+      meta: {title: 'Github', icon: 'github'}
     },
     ]
   }

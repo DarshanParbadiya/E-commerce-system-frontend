@@ -1,13 +1,13 @@
-<template> 
+<template> 
   <div class="app-container">
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets" style="margin-top: 5px"></i>
-      <span style="margin-top: 5px">数据列表</span>
+      <span style="margin-top: 5px">Data List</span>
       <el-button
         class="btn-add"
         @click="addProductAttrCate()"
         size="mini">
-        添加
+        Add
       </el-button>
     </el-card>
     <div class="table-container">
@@ -16,40 +16,40 @@
                 :data="list"
                 v-loading="listLoading"
                 border>
-        <el-table-column label="编号" width="100" align="center">
+        <el-table-column label="ID" width="100" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
-        <el-table-column label="类型名称" align="center">
+        <el-table-column label="Type Name" align="center">
           <template slot-scope="scope">{{scope.row.name}}</template>
         </el-table-column>
-        <el-table-column label="属性数量" width="200" align="center">
+        <el-table-column label="Number of Attributes" width="200" align="center">
           <template slot-scope="scope">{{scope.row.attributeCount==null?0:scope.row.attributeCount}}</template>
         </el-table-column>
-        <el-table-column label="参数数量" width="200" align="center">
+        <el-table-column label="Number of Parameters" width="200" align="center">
           <template slot-scope="scope">{{scope.row.paramCount==null?0:scope.row.paramCount}}</template>
         </el-table-column>
-        <el-table-column label="设置" width="200" align="center">
+        <el-table-column label="Settings" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="getAttrList(scope.$index, scope.row)">属性列表
+              @click="getAttrList(scope.$index, scope.row)">Attribute List
             </el-button>
             <el-button
               size="mini"
-              @click="getParamList(scope.$index, scope.row)">参数列表
+              @click="getParamList(scope.$index, scope.row)">Parameter List
             </el-button>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
+        <el-table-column label="Actions" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleUpdate(scope.$index, scope.row)">编辑
+              @click="handleUpdate(scope.$index, scope.row)">Edit
             </el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除
+              @click="handleDelete(scope.$index, scope.row)">Delete
             </el-button>
           </template>
         </el-table-column>
@@ -60,7 +60,7 @@
         background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
+        layout="total, sizes, prev, pager, next, jumper"
         :page-size="listQuery.pageSize"
         :page-sizes="[5,10,15]"
         :current-page.sync="listQuery.pageNum"
@@ -72,139 +72,139 @@
       :visible.sync="dialogVisible"
       :before-close="handleClose()"
       width="30%">
-      <el-form ref="productAttrCatForm":model="productAttrCate" :rules="rules" label-width="120px">
-        <el-form-item label="类型名称" prop="name">
+      <el-form ref="productAttrCatForm" :model="productAttrCate" :rules="rules" label-width="120px">
+        <el-form-item label="Type Name" prop="name">
           <el-input v-model="productAttrCate.name" auto-complete="off"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handleConfirm('productAttrCatForm')">确 定</el-button>
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="handleConfirm('productAttrCatForm')">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
-<script>
-  import {fetchList,createProductAttrCate,deleteProductAttrCate,updateProductAttrCate} from '@/api/productAttrCate'
 
-  export default {
-    name: 'productAttrCateList',
-    data() {
-      return {
-        list: null,
-        total: null,
-        listLoading: true,
-        listQuery: {
-          pageNum: 1,
-          pageSize: 5
-        },
-        dialogVisible: false,
-        dialogTitle:'',
-        productAttrCate:{
-          name:'',
-          id:null
-        },
-        rules: {
-          name: [
-            { required: true, message: '请输入类型名称', trigger: 'blur' }
-          ]
-        }
+<script>
+import { fetchList, createProductAttrCate, deleteProductAttrCate, updateProductAttrCate } from '@/api/productAttrCate'
+
+export default {
+  name: 'productAttrCateList',
+  data() {
+    return {
+      list: null,
+      total: null,
+      listLoading: true,
+      listQuery: {
+        pageNum: 1,
+        pageSize: 5
+      },
+      dialogVisible: false,
+      dialogTitle: '',
+      productAttrCate: {
+        name: '',
+        id: null
+      },
+      rules: {
+        name: [
+          { required: true, message: 'Please enter type name', trigger: 'blur' }
+        ]
       }
+    }
+  },
+  created() {
+    this.getList();
+  },
+  methods: {
+    getList() {
+      this.listLoading = true;
+      fetchList(this.listQuery).then(response => {
+        this.listLoading = false;
+        this.list = response.data.list;
+        this.total = response.data.total;
+      });
     },
-    created() {
+    addProductAttrCate() {
+      this.dialogVisible = true;
+      this.dialogTitle = "Add Type";
+    },
+    handleSizeChange(val) {
+      this.listQuery.pageNum = 1;
+      this.listQuery.pageSize = val;
       this.getList();
     },
-    methods: {
-      getList() {
-        this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
-          this.listLoading = false;
-          this.list = response.data.list;
-          this.total = response.data.total;
-        });
-      },
-      addProductAttrCate() {
-        this.dialogVisible = true;
-        this.dialogTitle = "添加类型";
-      },
-      handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      handleDelete(index, row) {
-        this.$confirm('是否要删除该品牌', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          deleteProductAttrCate(row.id).then(response=>{
-            this.$message({
-              message: '删除成功',
-              type: 'success',
-              duration:1000
-            });
-            this.getList();
+    handleCurrentChange(val) {
+      this.listQuery.pageNum = val;
+      this.getList();
+    },
+    handleDelete(index, row) {
+      this.$confirm('Are you sure you want to delete this brand?', 'Warning', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        deleteProductAttrCate(row.id).then(response => {
+          this.$message({
+            message: 'Deleted successfully',
+            type: 'success',
+            duration: 1000
           });
+          this.getList();
         });
-      },
-      handleUpdate(index, row) {
-        this.dialogVisible = true;
-        this.dialogTitle = "编辑类型";
-        this.productAttrCate.name = row.name;
-        this.productAttrCate.id = row.id;
-      },
-      getAttrList(index, row) {
-        this.$router.push({path: '/pms/productAttrList',query:{cid:row.id,cname:row.name,type:0}})
-      },
-      getParamList(index, row) {
-        this.$router.push({path: '/pms/productAttrList',query:{cid:row.id,cname:row.name,type:1}})
-      },
-      handleConfirm(formName){
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let data = new URLSearchParams();
-            data.append("name",this.productAttrCate.name);
-            if(this.dialogTitle==="添加类型"){
-              createProductAttrCate(data).then(response=>{
-                this.$message({
-                  message: '添加成功',
-                  type: 'success',
-                  duration:1000
-                });
-                this.dialogVisible = false;
-                this.getList();
+      });
+    },
+    handleUpdate(index, row) {
+      this.dialogVisible = true;
+      this.dialogTitle = "Edit Type";
+      this.productAttrCate.name = row.name;
+      this.productAttrCate.id = row.id;
+    },
+    getAttrList(index, row) {
+      this.$router.push({ path: '/pms/productAttrList', query: { cid: row.id, cname: row.name, type: 0 } });
+    },
+    getParamList(index, row) {
+      this.$router.push({ path: '/pms/productAttrList', query: { cid: row.id, cname: row.name, type: 1 } });
+    },
+    handleConfirm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let data = new URLSearchParams();
+          data.append("name", this.productAttrCate.name);
+          if (this.dialogTitle === "Add Type") {
+            createProductAttrCate(data).then(response => {
+              this.$message({
+                message: 'Added successfully',
+                type: 'success',
+                duration: 1000
               });
-            }else{
-              updateProductAttrCate(this.productAttrCate.id,data).then(response=>{
-                this.$message({
-                  message: '修改成功',
-                  type: 'success',
-                  duration:1000
-                });
-                this.dialogVisible = false;
-                this.getList();
-              });
-            }
+              this.dialogVisible = false;
+              this.getList();
+            });
           } else {
-            console.log('error submit!!');
-            return false;
+            updateProductAttrCate(this.productAttrCate.id, data).then(response => {
+              this.$message({
+                message: 'Updated successfully',
+                type: 'success',
+                duration: 1000
+              });
+              this.dialogVisible = false;
+              this.getList();
+            });
           }
-        });
-      },
-      handleClose(){
-        if (!this.dialogVisible && this.$refs.productAttrCatForm) {
-          this.$refs.productAttrCatForm.clearValidate()
+        } else {
+          console.log('error submit!!');
+          return false;
         }
+      });
+    },
+    handleClose() {
+      if (!this.dialogVisible && this.$refs.productAttrCatForm) {
+        this.$refs.productAttrCatForm.clearValidate()
       }
     }
   }
+}
 </script>
-<style rel="stylesheet/scss" lang="scss" scoped>
+
+<style scoped lang="scss">
 </style>
-
-
