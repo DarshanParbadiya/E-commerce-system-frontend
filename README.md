@@ -3,6 +3,12 @@
 This project demonstrates how Agile methodology was applied to **containerize, orchestrate, and enhance** a microservices-based e-commerce platform.  
 The work was managed in **Azure DevOps**, leveraging **initiatives, epics, features, and tickets** for structured execution.  
 
+deployed application here:  
+[https://mallapp.darshanparbadiya.site/](https://mallapp.darshanparbadiya.site/)  
+
+BACKEND apis here:  
+[https://apis.darshanparbadiya.site/](https://apis.darshanparbadiya.site/)
+
 ---
 ## DevOps Workflow Integration  
 
