@@ -1,133 +1,106 @@
-<template> 
+<template>
   <div class="app-container">
+    <!-- Filter/Search -->
     <el-card class="filter-container" shadow="never">
       <div>
         <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
-        <el-button
-          style="float:right"
-          type="primary"
-          @click="handleSearchList()"
-          size="small">
-          查询搜索
+        <span>Filter Search</span>
+        <el-button style="float:right" type="primary" @click="handleSearchList()" size="small">
+          Search
         </el-button>
-        <el-button
-          style="float:right;margin-right: 15px"
-          @click="handleResetSearch()"
-          size="small">
-          重置
+        <el-button style="float:right;margin-right: 15px" @click="handleResetSearch()" size="small">
+          Reset
         </el-button>
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="活动名称：">
-            <el-input v-model="listQuery.keyword" class="input-width" placeholder="活动名称" clearable></el-input>
+          <el-form-item label="Event Name:">
+            <el-input v-model="listQuery.keyword" class="input-width" placeholder="Event Name" clearable></el-input>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
+
+    <!-- Data List -->
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>数据列表</span>
-      <el-button size="mini" class="btn-add" @click="handleAdd()" style="margin-left: 20px">添加活动</el-button>
-      <el-button size="mini" class="btn-add" @click="handleShowSessionList()">秒杀时间段列表</el-button>
+      <span>Data List</span>
+      <el-button size="mini" class="btn-add" @click="handleAdd()" style="margin-left: 20px">Add Event</el-button>
+      <el-button size="mini" class="btn-add" @click="handleShowSessionList()">Flash Sale Time Slots</el-button>
     </el-card>
+
+    <!-- Table -->
     <div class="table-container">
-      <el-table ref="flashTable"
-                :data="list"
-                style="width: 100%;"
-                v-loading="listLoading" border>
+      <el-table ref="flashTable" :data="list" style="width: 100%;" v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="ID" width="100" align="center">
+          <template slot-scope="scope">{{ scope.row.id }}</template>
         </el-table-column>
-        <el-table-column label="活动标题" align="center">
-          <template slot-scope="scope">{{scope.row.title}}</template>
+        <el-table-column label="Event Title" align="center">
+          <template slot-scope="scope">{{ scope.row.title }}</template>
         </el-table-column>
-        <el-table-column label="活动状态" width="140" align="center">
-          <template slot-scope="scope">{{scope.row |formatActiveStatus}}</template>
+        <el-table-column label="Event Status" width="140" align="center">
+          <template slot-scope="scope">{{ scope.row | formatActiveStatus }}</template>
         </el-table-column>
-        <el-table-column label="开始时间" width="140" align="center">
-          <template slot-scope="scope">{{scope.row.startDate | formatDate}}</template>
+        <el-table-column label="Start Time" width="140" align="center">
+          <template slot-scope="scope">{{ scope.row.startDate | formatDate }}</template>
         </el-table-column>
-        <el-table-column label="结束时间" width="140" align="center">
-          <template slot-scope="scope">{{scope.row.endDate | formatDate}}</template>
+        <el-table-column label="End Time" width="140" align="center">
+          <template slot-scope="scope">{{ scope.row.endDate | formatDate }}</template>
         </el-table-column>
-        <el-table-column label="上线/下线" width="200" align="center">
+        <el-table-column label="Online/Offline" width="200" align="center">
           <template slot-scope="scope">
-            <el-switch
-              @change="handleStatusChange(scope.$index, scope.row)"
-              :active-value="1"
-              :inactive-value="0"
+            <el-switch @change="handleStatusChange(scope.$index, scope.row)" :active-value="1" :inactive-value="0"
               v-model="scope.row.status">
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column label="Actions" width="180" align="center">
           <template slot-scope="scope">
-            <el-button size="mini"
-                       type="text"
-                       @click="handleSelectSession(scope.$index, scope.row)">设置商品
+            <el-button size="mini" type="text" @click="handleSelectSession(scope.$index, scope.row)">Set Products
             </el-button>
-            <el-button size="mini"
-                       type="text"
-                       @click="handleUpdate(scope.$index, scope.row)">
-              编辑
+            <el-button size="mini" type="text" @click="handleUpdate(scope.$index, scope.row)">
+              Edit
             </el-button>
-            <el-button size="mini"
-                       type="text"
-                       @click="handleDelete(scope.$index, scope.row)">删除
+            <el-button size="mini" type="text" @click="handleDelete(scope.$index, scope.row)">Delete
             </el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+
+    <!-- Pagination -->
     <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :current-page.sync="listQuery.pageNum"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :total="total">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        layout="total, sizes, prev, pager, next, jumper" :current-page.sync="listQuery.pageNum"
+        :page-size="listQuery.pageSize" :page-sizes="[5, 10, 15]" :total="total">
       </el-pagination>
     </div>
-    <el-dialog
-      title="添加活动"
-      :visible.sync="dialogVisible"
-      width="40%">
-      <el-form :model="flashPromotion"
-               ref="flashPromotionForm"
-               label-width="150px" size="small">
-        <el-form-item label="活动标题：">
+
+    <!-- Add/Edit Dialog -->
+    <el-dialog title="Add Event" :visible.sync="dialogVisible" width="40%">
+      <el-form :model="flashPromotion" ref="flashPromotionForm" label-width="150px" size="small">
+        <el-form-item label="Event Title:">
           <el-input v-model="flashPromotion.title" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="开始时间：">
-          <el-date-picker
-            v-model="flashPromotion.startDate"
-            type="date"
-            placeholder="请选择时间">
+        <el-form-item label="Start Time:">
+          <el-date-picker v-model="flashPromotion.startDate" type="date" placeholder="Select Time">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="结束时间：">
-          <el-date-picker
-            v-model="flashPromotion.endDate"
-            type="date"
-            placeholder="请选择时间">
+        <el-form-item label="End Time:">
+          <el-date-picker v-model="flashPromotion.endDate" type="date" placeholder="Select Time">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="上线/下线">
+        <el-form-item label="Online/Offline">
           <el-radio-group v-model="flashPromotion.status">
-            <el-radio :label="1">上线</el-radio>
-            <el-radio :label="0">下线</el-radio>
+            <el-radio :label="1">Online</el-radio>
+            <el-radio :label="0">Offline</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">Cancel</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
@@ -170,11 +143,11 @@
         let startDate = new Date(row.startDate);
         let endDate = new Date(row.endDate);
         if (nowDate.getTime() >= startDate.getTime() && nowDate.getTime() <= endDate.getTime()) {
-          return '活动进行中';
+          return 'Ongoing';
         } else if (nowDate.getTime() > endDate.getTime()) {
-          return '活动已结束';
+          return 'Ended';
         } else {
-          return '活动未开始';
+          return 'Not Started';
         }
       },
       formatDate(time) {
@@ -211,35 +184,35 @@
         this.$router.push({path: '/sms/flashSession'})
       },
       handleStatusChange(index, row) {
-        this.$confirm('是否要修改该状态?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Do you want to change this status?', 'Notice', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           updateStatus(row.id, {status: row.status}).then(response => {
             this.$message({
               type: 'success',
-              message: '修改成功!'
+              message: 'Update successful!'
             });
           });
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '取消修改'
+            message: 'Update cancelled'
           });
           this.getList();
         });
       },
       handleDelete(index, row) {
-        this.$confirm('是否要删除该活动?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Do you want to delete this event?', 'Notice', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           deleteFlash(row.id).then(response => {
             this.$message({
               type: 'success',
-              message: '删除成功!'
+              message: 'Deleted successfully!'
             });
             this.getList();
           });
@@ -251,15 +224,15 @@
         this.flashPromotion = Object.assign({},row);
       },
       handleDialogConfirm() {
-        this.$confirm('是否要确认?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Are you sure?', 'Notice', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           if (this.isEdit) {
             updateFlash(this.flashPromotion.id,this.flashPromotion).then(response => {
               this.$message({
-                message: '修改成功！',
+                message: 'Update successful!',
                 type: 'success'
               });
               this.dialogVisible =false;
@@ -268,7 +241,7 @@
           } else {
             createFlash(this.flashPromotion).then(response => {
               this.$message({
-                message: '添加成功！',
+                message: 'Added successfully!',
                 type: 'success'
               });
               this.dialogVisible =false;
@@ -292,5 +265,3 @@
   }
 </script>
 <style></style>
-
-

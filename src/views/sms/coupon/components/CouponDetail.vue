@@ -1,11 +1,11 @@
-<template> 
+<template> 
   <el-card class="form-container" shadow="never">
     <el-form :model="coupon"
              :rules="rules"
-             ref="couponFrom"
+             ref="couponForm"
              label-width="150px"
              size="small">
-      <el-form-item label="优惠券类型：">
+      <el-form-item label="Coupon Type:">
         <el-select v-model="coupon.type">
           <el-option
             v-for="type in typeOptions"
@@ -15,10 +15,10 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="优惠券名称：" prop="name">
+      <el-form-item label="Coupon Name:" prop="name">
         <el-input v-model="coupon.name" class="input-width"></el-input>
       </el-form-item>
-      <el-form-item label="适用平台：">
+      <el-form-item label="Applicable Platform:">
         <el-select v-model="coupon.platform">
           <el-option
             v-for="item in platformOptions"
@@ -28,60 +28,60 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="总发行量：" prop="publishCount">
-        <el-input v-model.number="coupon.publishCount" placeholder="只能输入正整数" class="input-width"></el-input>
+      <el-form-item label="Total Issued:" prop="publishCount">
+        <el-input v-model.number="coupon.publishCount" placeholder="Only positive integers allowed" class="input-width"></el-input>
       </el-form-item>
-      <el-form-item label="面额：" prop="amount">
-        <el-input v-model.number="coupon.amount" placeholder="面值只能是数值，限2位小数" class="input-width">
-          <template slot="append">元</template>
+      <el-form-item label="Face Value:" prop="amount">
+        <el-input v-model.number="coupon.amount" placeholder="Value must be numeric, max 2 decimals" class="input-width">
+          <template slot="append">USD</template>
         </el-input>
       </el-form-item>
-      <el-form-item label="每人限领：">
-        <el-input v-model="coupon.perLimit" placeholder="只能输入正整数" class="input-width">
-          <template slot="append">张</template>
+      <el-form-item label="Limit per Person:">
+        <el-input v-model="coupon.perLimit" placeholder="Only positive integers allowed" class="input-width">
+          <template slot="append">coupons</template>
         </el-input>
       </el-form-item>
-      <el-form-item label="使用门槛：" prop="minPoint">
-        <el-input v-model.number="coupon.minPoint" placeholder="只能输入正整数" class="input-width">
-          <template slot="prepend">满</template>
-          <template slot="append">元可用</template>
+      <el-form-item label="Minimum Spend:" prop="minPoint">
+        <el-input v-model.number="coupon.minPoint" placeholder="Only positive integers allowed" class="input-width">
+          <template slot="prepend">Min</template>
+          <template slot="append">USD</template>
         </el-input>
       </el-form-item>
-      <el-form-item label="领取日期：" prop="enableTime">
-        <el-date-picker type="date" placeholder="选择日期" v-model="coupon.enableTime" class="input-width"></el-date-picker>
+      <el-form-item label="Claim Date:" prop="enableTime">
+        <el-date-picker type="date" placeholder="Select date" v-model="coupon.enableTime" class="input-width"></el-date-picker>
       </el-form-item>
-      <el-form-item label="有效期：">
-        <el-date-picker type="date" placeholder="选择日期" v-model="coupon.startTime" style="width: 150px"></el-date-picker>
-        <span style="margin-left: 20px;margin-right: 20px">至</span>
-        <el-date-picker type="date" placeholder="选择日期" v-model="coupon.endTime" style="width: 150px"></el-date-picker>
+      <el-form-item label="Validity Period:">
+        <el-date-picker type="date" placeholder="Select date" v-model="coupon.startTime" style="width: 150px"></el-date-picker>
+        <span style="margin-left: 20px;margin-right: 20px">to</span>
+        <el-date-picker type="date" placeholder="Select date" v-model="coupon.endTime" style="width: 150px"></el-date-picker>
       </el-form-item>
-      <el-form-item label="可使用商品：">
+      <el-form-item label="Applicable Products:">
         <el-radio-group v-model="coupon.useType">
-          <el-radio-button :label="0">全场通用</el-radio-button>
-          <el-radio-button :label="1">指定分类</el-radio-button>
-          <el-radio-button :label="2">指定商品</el-radio-button>
+          <el-radio-button :label="0">All Products</el-radio-button>
+          <el-radio-button :label="1">Specific Categories</el-radio-button>
+          <el-radio-button :label="2">Specific Products</el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item v-show="coupon.useType===1">
         <el-cascader
           clearable
-          placeholder="请选择分类名称"
+          placeholder="Select category"
           v-model="selectProductCate"
           :options="productCateOptions">
         </el-cascader>
-        <el-button @click="handleAddProductCategoryRelation()">添加</el-button>
+        <el-button @click="handleAddProductCategoryRelation()">Add</el-button>
         <el-table ref="productCateRelationTable"
                   :data="coupon.productCategoryRelationList"
                   style="width: 100%;margin-top: 20px"
                   border>
-          <el-table-column label="分类名称" align="center">
+          <el-table-column label="Category Name" align="center">
             <template slot-scope="scope">{{scope.row.parentCategoryName}}>{{scope.row.productCategoryName}}</template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="100">
+          <el-table-column label="Action" align="center" width="100">
             <template slot-scope="scope">
               <el-button size="mini"
                          type="text"
-                         @click="handleDeleteProductCateRelation(scope.$index, scope.row)">删除
+                         @click="handleDeleteProductCateRelation(scope.$index, scope.row)">Delete
               </el-button>
             </template>
           </el-table-column>
@@ -93,7 +93,7 @@
           filterable
           remote
           reserve-keyword
-          placeholder="商品名称/商品货号"
+          placeholder="Product Name / SKU"
           :remote-method="searchProductMethod"
           :loading="selectProductLoading">
           <el-option
@@ -105,43 +105,44 @@
             <span style="float: right; color: #8492a6; font-size: 13px">NO.{{ item.productSn }}</span>
           </el-option>
         </el-select>
-        <el-button @click="handleAddProductRelation()">添加</el-button>
+        <el-button @click="handleAddProductRelation()">Add</el-button>
         <el-table ref="productRelationTable"
                   :data="coupon.productRelationList"
                   style="width: 100%;margin-top: 20px"
                   border>
-          <el-table-column label="商品名称" align="center">
+          <el-table-column label="Product Name" align="center">
             <template slot-scope="scope">{{scope.row.productName}}</template>
           </el-table-column>
-          <el-table-column label="货号" align="center"  width="120" >
+          <el-table-column label="SKU" align="center"  width="120" >
             <template slot-scope="scope">NO.{{scope.row.productSn}}</template>
           </el-table-column>
-          <el-table-column label="操作" align="center" width="100">
+          <el-table-column label="Action" align="center" width="100">
             <template slot-scope="scope">
               <el-button size="mini"
                          type="text"
-                         @click="handleDeleteProductRelation(scope.$index, scope.row)">删除
+                         @click="handleDeleteProductRelation(scope.$index, scope.row)">Delete
               </el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-form-item>
-      <el-form-item label="备注：">
+      <el-form-item label="Notes:">
         <el-input
           class="input-width"
           type="textarea"
           :rows="5"
-          placeholder="请输入内容"
+          placeholder="Enter content"
           v-model="coupon.note">
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit('couponFrom')">提交</el-button>
-        <el-button v-if="!isEdit" @click="resetForm('couponFrom')">重置</el-button>
+        <el-button type="primary" @click="onSubmit('couponForm')">Submit</el-button>
+        <el-button v-if="!isEdit" @click="resetForm('couponForm')">Reset</el-button>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
+
 <script>
   import {createCoupon,getCoupon,updateCoupon} from '@/api/coupon';
   import {fetchSimpleList as fetchProductList} from '@/api/product';
@@ -162,44 +163,20 @@
     productCategoryRelationList: []
   };
   const defaultTypeOptions = [
-    {
-      label: '全场赠券',
-      value: 0
-    },
-    {
-      label: '会员赠券',
-      value: 1
-    },
-    {
-      label: '购物赠券',
-      value: 2
-    },
-    {
-      label: '注册赠券',
-      value: 3
-    }
+    { label: 'Site-wide Coupon', value: 0 },
+    { label: 'Member Coupon', value: 1 },
+    { label: 'Shopping Coupon', value: 2 },
+    { label: 'Registration Coupon', value: 3 }
   ];
   const defaultPlatformOptions = [
-    {
-      label: '全平台',
-      value: 0
-    },
-    {
-      label: '移动平台',
-      value: 1
-    },
-    {
-      label: 'PC平台',
-      value: 2
-    }
+    { label: 'All Platforms', value: 0 },
+    { label: 'Mobile', value: 1 },
+    { label: 'PC', value: 2 }
   ];
   export default {
     name: 'CouponDetail',
     props: {
-      isEdit: {
-        type: Boolean,
-        default: false
-      }
+      isEdit: { type: Boolean, default: false }
     },
     data() {
       return {
@@ -208,17 +185,17 @@
         platformOptions: Object.assign({}, defaultPlatformOptions),
         rules: {
           name: [
-            {required: true, message: '请输入优惠券名称', trigger: 'blur'},
-            {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
+            {required: true, message: 'Please enter coupon name', trigger: 'blur'},
+            {min: 2, max: 140, message: 'Length must be 2-140 characters', trigger: 'blur'}
           ],
           publishCount: [
-            {type: 'number',required: true, message: '只能输入正整数', trigger: 'blur'}
+            {type: 'number',required: true, message: 'Only positive integers allowed', trigger: 'blur'}
           ],
           amount: [
-            {type: 'number',required: true,message: '面值只能是数值，0.01-10000，限2位小数',trigger: 'blur'}
+            {type: 'number',required: true,message: 'Value must be numeric, 0.01-10000, max 2 decimals',trigger: 'blur'}
           ],
           minPoint: [
-            {type: 'number',required: true,message: '只能输入正整数',trigger: 'blur'}
+            {type: 'number',required: true,message: 'Only positive integers allowed',trigger: 'blur'}
           ]
         },
         selectProduct:null,
@@ -240,39 +217,27 @@
       onSubmit(formName) {
         this.$refs[formName].validate((valid) => {
           if (valid) {
-            this.$confirm('是否提交数据', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
+            this.$confirm('Do you want to submit the data?', 'Confirm', {
+              confirmButtonText: 'Yes',
+              cancelButtonText: 'No',
               type: 'warning'
             }).then(() => {
               if(this.isEdit){
                 updateCoupon(this.$route.query.id,this.coupon).then(response=>{
                   this.$refs[formName].resetFields();
-                  this.$message({
-                    message: '修改成功',
-                    type: 'success',
-                    duration:1000
-                  });
+                  this.$message({ message: 'Update successful', type: 'success', duration:1000 });
                   this.$router.back();
                 });
               }else{
                 createCoupon(this.coupon).then(response=>{
                   this.$refs[formName].resetFields();
-                  this.$message({
-                    message: '提交成功',
-                    type: 'success',
-                    duration:1000
-                  });
+                  this.$message({ message: 'Submission successful', type: 'success', duration:1000 });
                   this.$router.back();
                 });
               }
             });
           } else {
-            this.$message({
-              message: '验证失败',
-              type: 'error',
-              duration:1000
-            });
+            this.$message({ message: 'Validation failed', type: 'error', duration:1000 });
             return false;
           }
         });
@@ -299,10 +264,7 @@
       },
       handleAddProductRelation(){
         if(this.selectProduct===null){
-          this.$message({
-            message: '请先选择商品',
-            type: 'warning'
-          });
+          this.$message({ message: 'Please select a product first', type: 'warning' });
           return
         }
         this.coupon.productRelationList.push(this.getProductById(this.selectProduct));
@@ -313,10 +275,7 @@
       },
       handleAddProductCategoryRelation(){
         if(this.selectProductCate===null||this.selectProductCate.length===0){
-          this.$message({
-            message: '请先选择商品分类',
-            type: 'warning'
-          });
+          this.$message({ message: 'Please select a product category first', type: 'warning' });
           return
         }
         this.coupon.productCategoryRelationList.push(this.getProductCateByIds(this.selectProductCate));
@@ -366,10 +325,9 @@
     }
   }
 </script>
+
 <style scoped>
   .input-width {
     width: 60%;
   }
 </style>
-
-
