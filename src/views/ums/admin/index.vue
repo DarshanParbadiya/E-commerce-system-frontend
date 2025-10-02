@@ -1,60 +1,62 @@
-<template> 
+<template>
   <div class="app-container">
     <el-card class="filter-container" shadow="never">
       <div>
         <i class="el-icon-search"></i>
-        <span>筛选搜索</span>
+        <span>Filter Search</span>
         <el-button
           style="float:right"
           type="primary"
           @click="handleSearchList()"
           size="small">
-          查询搜索
+          Search
         </el-button>
         <el-button
           style="float:right;margin-right: 15px"
           @click="handleResetSearch()"
           size="small">
-          重置
+          Reset
         </el-button>
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="输入搜索：">
-            <el-input v-model="listQuery.keyword" class="input-width" placeholder="帐号/姓名" clearable></el-input>
+          <el-form-item label="Search Input:">
+            <el-input v-model="listQuery.keyword" class="input-width" placeholder="Username/Name" clearable></el-input>
           </el-form-item>
         </el-form>
       </div>
     </el-card>
+
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets"></i>
-      <span>数据列表</span>
-      <el-button size="mini" class="btn-add" @click="handleAdd()" style="margin-left: 20px">添加</el-button>
+      <span>Data List</span>
+      <el-button size="mini" class="btn-add" @click="handleAdd()" style="margin-left: 20px">Add</el-button>
     </el-card>
+
     <div class="table-container">
       <el-table ref="adminTable"
                 :data="list"
                 style="width: 100%;"
                 v-loading="listLoading" border>
-        <el-table-column label="编号" width="100" align="center">
+        <el-table-column label="ID" width="100" align="center">
           <template slot-scope="scope">{{scope.row.id}}</template>
         </el-table-column>
-        <el-table-column label="帐号" align="center">
+        <el-table-column label="Username" align="center">
           <template slot-scope="scope">{{scope.row.username}}</template>
         </el-table-column>
-        <el-table-column label="姓名" align="center">
+        <el-table-column label="Name" align="center">
           <template slot-scope="scope">{{scope.row.nickName}}</template>
         </el-table-column>
-        <el-table-column label="邮箱" align="center">
+        <el-table-column label="Email" align="center">
           <template slot-scope="scope">{{scope.row.email}}</template>
         </el-table-column>
-        <el-table-column label="添加时间" width="160" align="center">
+        <el-table-column label="Created At" width="160" align="center">
           <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
         </el-table-column>
-        <el-table-column label="最后登录" width="160" align="center">
+        <el-table-column label="Last Login" width="160" align="center">
           <template slot-scope="scope">{{scope.row.loginTime | formatDateTime}}</template>
         </el-table-column>
-        <el-table-column label="是否启用" width="140" align="center">
+        <el-table-column label="Enabled" width="140" align="center">
           <template slot-scope="scope">
             <el-switch
               @change="handleStatusChange(scope.$index, scope.row)"
@@ -64,79 +66,82 @@
             </el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column label="Actions" width="180" align="center">
           <template slot-scope="scope">
             <el-button size="mini"
                        type="text"
-                       @click="handleSelectRole(scope.$index, scope.row)">分配角色
+                       @click="handleSelectRole(scope.$index, scope.row)">Assign Role
             </el-button>
             <el-button size="mini"
                        type="text"
                        @click="handleUpdate(scope.$index, scope.row)">
-              编辑
+              Edit
             </el-button>
             <el-button size="mini"
                        type="text"
-                       @click="handleDelete(scope.$index, scope.row)">删除
+                       @click="handleDelete(scope.$index, scope.row)">Delete
             </el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
+
     <div class="pagination-container">
       <el-pagination
         background
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
+        layout="total, sizes, prev, pager, next, jumper"
         :current-page.sync="listQuery.pageNum"
         :page-size="listQuery.pageSize"
         :page-sizes="[10,15,20]"
         :total="total">
       </el-pagination>
     </div>
+
     <el-dialog
-      :title="isEdit?'编辑用户':'添加用户'"
+      :title="isEdit ? 'Edit User' : 'Add User'"
       :visible.sync="dialogVisible"
       width="40%">
       <el-form :model="admin"
                ref="adminForm"
                label-width="150px" size="small">
-        <el-form-item label="帐号：">
+        <el-form-item label="Username:">
           <el-input v-model="admin.username" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="姓名：">
+        <el-form-item label="Name:">
           <el-input v-model="admin.nickName" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱：">
+        <el-form-item label="Email:">
           <el-input v-model="admin.email" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="密码：">
+        <el-form-item label="Password:">
           <el-input v-model="admin.password"  type="password" style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="备注：">
+        <el-form-item label="Note:">
           <el-input v-model="admin.note"
                     type="textarea"
                     :rows="5"
                     style="width: 250px"></el-input>
         </el-form-item>
-        <el-form-item label="是否启用：">
+        <el-form-item label="Enabled:">
           <el-radio-group v-model="admin.status">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
+            <el-radio :label="1">Yes</el-radio>
+            <el-radio :label="0">No</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleDialogConfirm()" size="small">确 定</el-button>
+        <el-button @click="dialogVisible = false" size="small">Cancel</el-button>
+        <el-button type="primary" @click="handleDialogConfirm()" size="small">Confirm</el-button>
       </span>
     </el-dialog>
+
     <el-dialog
-      title="分配角色"
+      title="Assign Role"
       :visible.sync="allocDialogVisible"
       width="30%">
-      <el-select v-model="allocRoleIds" multiple placeholder="请选择" size="small" style="width: 80%">
+      <el-select v-model="allocRoleIds" multiple placeholder="Please select" size="small" style="width: 80%">
         <el-option
           v-for="item in allRoleList"
           :key="item.id"
@@ -145,22 +150,24 @@
         </el-option>
       </el-select>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="allocDialogVisible = false" size="small">取 消</el-button>
-        <el-button type="primary" @click="handleAllocDialogConfirm()" size="small">确 定</el-button>
+        <el-button @click="allocDialogVisible = false" size="small">Cancel</el-button>
+        <el-button type="primary" @click="handleAllocDialogConfirm()" size="small">Confirm</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
+
 <script>
-  import {fetchList,createAdmin,updateAdmin,updateStatus,deleteAdmin,getRoleByAdmin,allocRole} from '@/api/login';
-  import {fetchAllRoleList} from '@/api/role';
-  import {formatDate} from '@/utils/date';
+  import { fetchList, createAdmin, updateAdmin, updateStatus, deleteAdmin, getRoleByAdmin, allocRole } from '@/api/login';
+  import { fetchAllRoleList } from '@/api/role';
+  import { formatDate } from '@/utils/date';
 
   const defaultListQuery = {
     pageNum: 1,
     pageSize: 10,
     keyword: null
   };
+  
   const defaultAdmin = {
     id: null,
     username: null,
@@ -170,6 +177,7 @@
     note: null,
     status: 1
   };
+  
   export default {
     name: 'adminList',
     data() {
@@ -182,9 +190,9 @@
         admin: Object.assign({}, defaultAdmin),
         isEdit: false,
         allocDialogVisible: false,
-        allocRoleIds:[],
-        allRoleList:[],
-        allocAdminId:null
+        allocRoleIds: [],
+        allRoleList: [],
+        allocAdminId: null
       }
     },
     created() {
@@ -220,38 +228,38 @@
       handleAdd() {
         this.dialogVisible = true;
         this.isEdit = false;
-        this.admin = Object.assign({},defaultAdmin);
+        this.admin = Object.assign({}, defaultAdmin);
       },
       handleStatusChange(index, row) {
-        this.$confirm('是否要修改该状态?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Do you want to change this status?', 'Prompt', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
-          updateStatus(row.id, {status: row.status}).then(response => {
+          updateStatus(row.id, { status: row.status }).then(response => {
             this.$message({
               type: 'success',
-              message: '修改成功!'
+              message: 'Status updated successfully!'
             });
           });
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '取消修改'
+            message: 'Change canceled'
           });
           this.getList();
         });
       },
       handleDelete(index, row) {
-        this.$confirm('是否要删除该用户?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Do you want to delete this user?', 'Prompt', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           deleteAdmin(row.id).then(response => {
             this.$message({
               type: 'success',
-              message: '删除成功!'
+              message: 'Deleted successfully!'
             });
             this.getList();
           });
@@ -260,39 +268,39 @@
       handleUpdate(index, row) {
         this.dialogVisible = true;
         this.isEdit = true;
-        this.admin = Object.assign({},row);
+        this.admin = Object.assign({}, row);
       },
       handleDialogConfirm() {
-        this.$confirm('是否要确认?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+        this.$confirm('Do you want to confirm?', 'Prompt', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           if (this.isEdit) {
-            updateAdmin(this.admin.id,this.admin).then(response => {
+            updateAdmin(this.admin.id, this.admin).then(response => {
               this.$message({
-                message: '修改成功！',
+                message: 'Updated successfully!',
                 type: 'success'
               });
-              this.dialogVisible =false;
+              this.dialogVisible = false;
               this.getList();
             })
           } else {
             createAdmin(this.admin).then(response => {
               this.$message({
-                message: '添加成功！',
+                message: 'Added successfully!',
                 type: 'success'
               });
-              this.dialogVisible =false;
+              this.dialogVisible = false;
               this.getList();
             })
           }
         })
       },
-      handleAllocDialogConfirm(){
-        this.$confirm('是否要确认?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+      handleAllocDialogConfirm() {
+        this.$confirm('Do you want to confirm?', 'Prompt', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           let params = new URLSearchParams();
@@ -300,14 +308,14 @@
           params.append("roleIds", this.allocRoleIds);
           allocRole(params).then(response => {
             this.$message({
-              message: '分配成功！',
+              message: 'Role assigned successfully!',
               type: 'success'
             });
             this.allocDialogVisible = false;
           })
         })
       },
-      handleSelectRole(index,row){
+      handleSelectRole(index, row) {
         this.allocAdminId = row.id;
         this.allocDialogVisible = true;
         this.getRoleListByAdmin(row.id);
@@ -328,9 +336,9 @@
       getRoleListByAdmin(adminId) {
         getRoleByAdmin(adminId).then(response => {
           let allocRoleList = response.data;
-          this.allocRoleIds=[];
-          if(allocRoleList!=null&&allocRoleList.length>0){
-            for(let i=0;i<allocRoleList.length;i++){
+          this.allocRoleIds = [];
+          if (allocRoleList != null && allocRoleList.length > 0) {
+            for (let i = 0; i < allocRoleList.length; i++) {
               this.allocRoleIds.push(allocRoleList[i].id);
             }
           }
@@ -340,5 +348,3 @@
   }
 </script>
 <style></style>
-
-
