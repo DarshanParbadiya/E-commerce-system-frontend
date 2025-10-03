@@ -2,7 +2,7 @@
   <div class="docs-dashboard">
     <el-row :gutter="20" class="dashboard-header">
       <el-col :span="24">
-        <h1>Mall Project Documentation Dashboard</h1>
+        <h1>E-commerce system Documentation Dashboard</h1>
         <p class="sub-title">
           Quick access to microservices, monitoring, and tools
         </p>
