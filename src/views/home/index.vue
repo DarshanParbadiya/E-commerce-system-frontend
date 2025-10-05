@@ -28,6 +28,7 @@
         </el-col>
       </el-row>
     </div>
+     
     <div class="total-layout">
       <el-row :gutter="20">
         <el-col :span="6">

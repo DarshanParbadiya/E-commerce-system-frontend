@@ -7,8 +7,8 @@
           Quick access to microservices, monitoring, and tools
         </p>
       </el-col>
-    </el-row>
-
+    </el-row><p>
+    {{ $t('home.welcome.welcome') }}</p>
     <el-row :gutter="20">
       <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="service in services" :key="service.name">
         <el-card shadow="hover" class="service-card">
