@@ -3,29 +3,29 @@ import { Message, MessageBox } from 'element-ui'
 import store from '../store'
 import { getToken } from '@/utils/auth'
 
-// 创建axios实例
+// Create axios instance
 const service = axios.create({
-  baseURL: process.env.BASE_API, // api的base_url
-  timeout: 15000 // 请求超时时间
+  baseURL: process.env.BASE_API, // base_url of the API
+  timeout: 15000 // Request timeout
 })
 
-// request拦截器
+// Request interceptor
 service.interceptors.request.use(config => {
   if (store.getters.token) {
-    config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    config.headers['Authorization'] = getToken() // Attach custom token to each request, modify as needed
   }
   return config
 }, error => {
-  // Do something with request error
+  // Handle request error
   console.log(error) // for debug
   Promise.reject(error)
 })
 
-// respone拦截器
+// Response interceptor
 service.interceptors.response.use(
   response => {
   /**
-  * code为非200是抛错 可结合自己业务进行修改
+  * If code is not 200, throw an error; adjust this logic based on your business needs
   */
     const res = response.data
     if (res.code !== 200) {
@@ -35,15 +35,15 @@ service.interceptors.response.use(
         duration: 3 * 1000
       })
 
-      // 401:未登录;
+      // 401: not logged in
       if (res.code === 401) {
-        MessageBox.confirm('你已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
+        MessageBox.confirm('You have been logged out. You can cancel to stay on this page, or log in again.', 'Confirm logout', {
+          confirmButtonText: 'Log in again',
+          cancelButtonText: 'Cancel',
           type: 'warning'
         }).then(() => {
           store.dispatch('FedLogOut').then(() => {
-            location.reload()// 为了重新实例化vue-router对象 避免bug
+            location.reload() // To reinitialize the vue-router object and avoid bugs
           })
         })
       }
