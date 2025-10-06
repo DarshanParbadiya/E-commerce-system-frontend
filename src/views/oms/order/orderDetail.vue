@@ -271,13 +271,13 @@
             <el-col :span="6" class="table-cell-title">Points Deduction</el-col>
           </el-row>
           <el-row>
-            <el-col :span="6" class="table-cell">￥{{ order.totalAmount }}</el-col>
+            <el-col :span="6" class="table-cell">${{ order.totalAmount }}</el-col>
             <el-col :span="6" class="table-cell">
               <el-input v-model.number="moneyInfo.freightAmount" size="mini"><template
-                  slot="prepend">￥</template></el-input>
+                  slot="prepend">$</template></el-input>
             </el-col>
-            <el-col :span="6" class="table-cell">-￥{{ order.couponAmount }}</el-col>
-            <el-col :span="6" class="table-cell">-￥{{ order.integrationAmount }}</el-col>
+            <el-col :span="6" class="table-cell">-${{ order.couponAmount }}</el-col>
+            <el-col :span="6" class="table-cell">-${{ order.integrationAmount }}</el-col>
           </el-row>
           <el-row>
             <el-col :span="6" class="table-cell-title">Promotion Discount</el-col>
@@ -286,17 +286,17 @@
             <el-col :span="6" class="table-cell-title">Amount Payable</el-col>
           </el-row>
           <el-row>
-            <el-col :span="6" class="table-cell">-￥{{ order.promotionAmount }}</el-col>
+            <el-col :span="6" class="table-cell">-${{ order.promotionAmount }}</el-col>
             <el-col :span="6" class="table-cell">
               <el-input v-model.number="moneyInfo.discountAmount" size="mini"><template
-                  slot="prepend">-￥</template></el-input>
+                  slot="prepend">-$</template></el-input>
             </el-col>
             <el-col :span="6" class="table-cell">
-              <span class="color-danger">￥{{ order.totalAmount + moneyInfo.freightAmount }}</span>
+              <span class="color-danger">${{ order.totalAmount + moneyInfo.freightAmount }}</span>
             </el-col>
             <el-col :span="6" class="table-cell">
-              <span class="color-danger">￥{{ order.payAmount + moneyInfo.freightAmount - moneyInfo.discountAmount
-                }}</span>
+              <span class="color-danger">${{ order.payAmount + moneyInfo.freightAmount - moneyInfo.discountAmount
+              }}</span>
             </el-col>
           </el-row>
         </div>
@@ -351,244 +351,244 @@
   </div>
 </template>
 <script>
-  import { getOrderDetail, updateReceiverInfo, updateMoneyInfo, closeOrder, updateOrderNote, deleteOrder } from '@/api/order';
-  import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
-  import { formatDate } from '@/utils/date';
-  import VDistpicker from 'v-distpicker';
+import { getOrderDetail, updateReceiverInfo, updateMoneyInfo, closeOrder, updateOrderNote, deleteOrder } from '@/api/order';
+import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
+import { formatDate } from '@/utils/date';
+import VDistpicker from 'v-distpicker';
 
-  const defaultReceiverInfo = {
-    orderId: null,
-    receiverName: null,
-    receiverPhone: null,
-    receiverPostCode: null,
-    receiverDetailAddress: null,
-    receiverProvince: null,
-    receiverCity: null,
-    receiverRegion: null,
-    status: null
-  };
+const defaultReceiverInfo = {
+  orderId: null,
+  receiverName: null,
+  receiverPhone: null,
+  receiverPostCode: null,
+  receiverDetailAddress: null,
+  receiverProvince: null,
+  receiverCity: null,
+  receiverRegion: null,
+  status: null
+};
 
-  export default {
-    name: 'orderDetail',
-    components: { VDistpicker, LogisticsDialog },
-    data() {
-      return {
-        id: null,
-        order: {},
-        receiverDialogVisible: false,
-        receiverInfo: Object.assign({}, defaultReceiverInfo),
-        moneyDialogVisible: false,
-        moneyInfo: { orderId: null, freightAmount: 0, discountAmount: 0, status: null },
-        messageDialogVisible: false,
-        message: { title: null, content: null },
-        closeDialogVisible: false,
-        closeInfo: { note: null, id: null },
-        markOrderDialogVisible: false,
-        markInfo: { note: null },
-        logisticsDialogVisible: false
+export default {
+  name: 'orderDetail',
+  components: { VDistpicker, LogisticsDialog },
+  data() {
+    return {
+      id: null,
+      order: {},
+      receiverDialogVisible: false,
+      receiverInfo: Object.assign({}, defaultReceiverInfo),
+      moneyDialogVisible: false,
+      moneyInfo: { orderId: null, freightAmount: 0, discountAmount: 0, status: null },
+      messageDialogVisible: false,
+      message: { title: null, content: null },
+      closeDialogVisible: false,
+      closeInfo: { note: null, id: null },
+      markOrderDialogVisible: false,
+      markInfo: { note: null },
+      logisticsDialogVisible: false
+    };
+  },
+  created() {
+    this.id = this.list = this.$route.query.id;
+    getOrderDetail(this.id).then(response => {
+      this.order = response.data;
+    });
+  },
+  filters: {
+    formatNull(value) {
+      return (value === undefined || value === null || value === '') ? 'None' : value;
+    },
+    formatLongText(value) {
+      if (value === undefined || value === null || value === '') {
+        return 'None';
+      } else if (value.length > 8) {
+        return value.substr(0, 8) + '...';
+      } else {
+        return value;
+      }
+    },
+    formatPayType(value) {
+      if (value === 1) return 'Alipay';
+      if (value === 2) return 'WeChat';
+      return 'Unpaid';
+    },
+    formatSourceType(value) {
+      return value === 1 ? 'App Order' : 'PC Order';
+    },
+    formatOrderType(value) {
+      return value === 1 ? 'Flash Sale Order' : 'Normal Order';
+    },
+    formatAddress(order) {
+      let str = order.receiverProvince;
+      if (order.receiverCity != null) str += " " + order.receiverCity;
+      str += " " + order.receiverRegion;
+      str += " " + order.receiverDetailAddress;
+      return str;
+    },
+    formatStatus(value) {
+      switch (value) {
+        case 1: return 'Pending Shipment';
+        case 2: return 'Shipped';
+        case 3: return 'Completed';
+        case 4: return 'Closed';
+        case 5: return 'Invalid Order';
+        default: return 'Pending Payment';
+      }
+    },
+    formatPayStatus(value) {
+      if (value === 0) return 'Unpaid';
+      if (value === 4) return 'Refunded';
+      return 'Paid';
+    },
+    formatDeliverStatus(value) {
+      return (value === 0 || value === 1) ? 'Not Shipped' : 'Shipped';
+    },
+    formatProductAttr(value) {
+      if (!value) return '';
+      const attr = JSON.parse(value);
+      return attr.map(a => `${a.key}:${a.value};`).join('');
+    }
+  },
+  methods: {
+    onSelectRegion(data) {
+      this.receiverInfo.receiverProvince = data.province.value;
+      this.receiverInfo.receiverCity = data.city.value;
+      this.receiverInfo.receiverRegion = data.area.value;
+    },
+    formatTime(time) {
+      if (!time) return '';
+      return formatDate(new Date(time), 'yyyy-MM-dd hh:mm:ss');
+    },
+    formatStepStatus(value) {
+      if (value === 1) return 2; // Pending shipment
+      if (value === 2) return 3; // Shipped
+      if (value === 3) return 4; // Completed
+      return 1; // Pending payment, Closed, or Invalid
+    },
+    showUpdateReceiverDialog() {
+      this.receiverDialogVisible = true;
+      this.receiverInfo = {
+        orderId: this.order.id,
+        receiverName: this.order.receiverName,
+        receiverPhone: this.order.receiverPhone,
+        receiverPostCode: this.order.receiverPostCode,
+        receiverDetailAddress: this.order.receiverDetailAddress,
+        receiverProvince: this.order.receiverProvince,
+        receiverCity: this.order.receiverCity,
+        receiverRegion: this.order.receiverRegion,
+        status: this.order.status
       };
     },
-    created() {
-      this.id = this.list = this.$route.query.id;
-      getOrderDetail(this.id).then(response => {
-        this.order = response.data;
+    handleUpdateReceiverInfo() {
+      this.$confirm('Do you want to update the receiver information?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        updateReceiverInfo(this.receiverInfo).then(() => {
+          this.receiverDialogVisible = false;
+          this.$message({ type: 'success', message: 'Update successful!' });
+          getOrderDetail(this.id).then(response => { this.order = response.data; });
+        });
       });
     },
-    filters: {
-      formatNull(value) {
-        return (value === undefined || value === null || value === '') ? 'None' : value;
-      },
-      formatLongText(value) {
-        if (value === undefined || value === null || value === '') {
-          return 'None';
-        } else if (value.length > 8) {
-          return value.substr(0, 8) + '...';
-        } else {
-          return value;
-        }
-      },
-      formatPayType(value) {
-        if (value === 1) return 'Alipay';
-        if (value === 2) return 'WeChat';
-        return 'Unpaid';
-      },
-      formatSourceType(value) {
-        return value === 1 ? 'App Order' : 'PC Order';
-      },
-      formatOrderType(value) {
-        return value === 1 ? 'Flash Sale Order' : 'Normal Order';
-      },
-      formatAddress(order) {
-        let str = order.receiverProvince;
-        if (order.receiverCity != null) str += " " + order.receiverCity;
-        str += " " + order.receiverRegion;
-        str += " " + order.receiverDetailAddress;
-        return str;
-      },
-      formatStatus(value) {
-        switch (value) {
-          case 1: return 'Pending Shipment';
-          case 2: return 'Shipped';
-          case 3: return 'Completed';
-          case 4: return 'Closed';
-          case 5: return 'Invalid Order';
-          default: return 'Pending Payment';
-        }
-      },
-      formatPayStatus(value) {
-        if (value === 0) return 'Unpaid';
-        if (value === 4) return 'Refunded';
-        return 'Paid';
-      },
-      formatDeliverStatus(value) {
-        return (value === 0 || value === 1) ? 'Not Shipped' : 'Shipped';
-      },
-      formatProductAttr(value) {
-        if (!value) return '';
-        const attr = JSON.parse(value);
-        return attr.map(a => `${a.key}:${a.value};`).join('');
-      }
+    showUpdateMoneyDialog() {
+      this.moneyDialogVisible = true;
+      this.moneyInfo.orderId = this.order.id;
+      this.moneyInfo.freightAmount = this.order.freightAmount;
+      this.moneyInfo.discountAmount = this.order.discountAmount;
+      this.moneyInfo.status = this.order.status;
     },
-    methods: {
-      onSelectRegion(data) {
-        this.receiverInfo.receiverProvince = data.province.value;
-        this.receiverInfo.receiverCity = data.city.value;
-        this.receiverInfo.receiverRegion = data.area.value;
-      },
-      formatTime(time) {
-        if (!time) return '';
-        return formatDate(new Date(time), 'yyyy-MM-dd hh:mm:ss');
-      },
-      formatStepStatus(value) {
-        if (value === 1) return 2; // Pending shipment
-        if (value === 2) return 3; // Shipped
-        if (value === 3) return 4; // Completed
-        return 1; // Pending payment, Closed, or Invalid
-      },
-      showUpdateReceiverDialog() {
-        this.receiverDialogVisible = true;
-        this.receiverInfo = {
-          orderId: this.order.id,
-          receiverName: this.order.receiverName,
-          receiverPhone: this.order.receiverPhone,
-          receiverPostCode: this.order.receiverPostCode,
-          receiverDetailAddress: this.order.receiverDetailAddress,
-          receiverProvince: this.order.receiverProvince,
-          receiverCity: this.order.receiverCity,
-          receiverRegion: this.order.receiverRegion,
-          status: this.order.status
-        };
-      },
-      handleUpdateReceiverInfo() {
-        this.$confirm('Do you want to update the receiver information?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          updateReceiverInfo(this.receiverInfo).then(() => {
-            this.receiverDialogVisible = false;
-            this.$message({ type: 'success', message: 'Update successful!' });
-            getOrderDetail(this.id).then(response => { this.order = response.data; });
-          });
+    handleUpdateMoneyInfo() {
+      this.$confirm('Do you want to update the cost information?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        updateMoneyInfo(this.moneyInfo).then(() => {
+          this.moneyDialogVisible = false;
+          this.$message({ type: 'success', message: 'Update successful!' });
+          getOrderDetail(this.id).then(response => { this.order = response.data; });
         });
-      },
-      showUpdateMoneyDialog() {
-        this.moneyDialogVisible = true;
-        this.moneyInfo.orderId = this.order.id;
-        this.moneyInfo.freightAmount = this.order.freightAmount;
-        this.moneyInfo.discountAmount = this.order.discountAmount;
-        this.moneyInfo.status = this.order.status;
-      },
-      handleUpdateMoneyInfo() {
-        this.$confirm('Do you want to update the cost information?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          updateMoneyInfo(this.moneyInfo).then(() => {
-            this.moneyDialogVisible = false;
-            this.$message({ type: 'success', message: 'Update successful!' });
-            getOrderDetail(this.id).then(response => { this.order = response.data; });
-          });
+      });
+    },
+    showMessageDialog() {
+      this.messageDialogVisible = true;
+      this.message.title = null;
+      this.message.content = null;
+    },
+    handleSendMessage() {
+      this.$confirm('Do you want to send the message?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        this.messageDialogVisible = false;
+        this.$message({ type: 'success', message: 'Message sent!' });
+      });
+    },
+    showCloseOrderDialog() {
+      this.closeDialogVisible = true;
+      this.closeInfo.note = null;
+      this.closeInfo.id = this.id;
+    },
+    handleCloseOrder() {
+      this.$confirm('Do you want to close the order?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        const params = new URLSearchParams();
+        params.append("ids", [this.closeInfo.id]);
+        params.append("note", this.closeInfo.note);
+        closeOrder(params).then(() => {
+          this.closeDialogVisible = false;
+          this.$message({ type: 'success', message: 'Order closed successfully!' });
+          getOrderDetail(this.id).then(response => { this.order = response.data; });
         });
-      },
-      showMessageDialog() {
-        this.messageDialogVisible = true;
-        this.message.title = null;
-        this.message.content = null;
-      },
-      handleSendMessage() {
-        this.$confirm('Do you want to send the message?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          this.messageDialogVisible = false;
-          this.$message({ type: 'success', message: 'Message sent!' });
+      });
+    },
+    showMarkOrderDialog() {
+      this.markOrderDialogVisible = true;
+      this.markInfo.id = this.id;
+      this.closeOrder.note = null;
+    },
+    handleMarkOrder() {
+      this.$confirm('Do you want to add a note to the order?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        const params = new URLSearchParams();
+        params.append("id", this.markInfo.id);
+        params.append("note", this.markInfo.note);
+        params.append("status", this.order.status);
+        updateOrderNote(params).then(() => {
+          this.markOrderDialogVisible = false;
+          this.$message({ type: 'success', message: 'Order note added successfully!' });
+          getOrderDetail(this.id).then(response => { this.order = response.data; });
         });
-      },
-      showCloseOrderDialog() {
-        this.closeDialogVisible = true;
-        this.closeInfo.note = null;
-        this.closeInfo.id = this.id;
-      },
-      handleCloseOrder() {
-        this.$confirm('Do you want to close the order?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          const params = new URLSearchParams();
-          params.append("ids", [this.closeInfo.id]);
-          params.append("note", this.closeInfo.note);
-          closeOrder(params).then(() => {
-            this.closeDialogVisible = false;
-            this.$message({ type: 'success', message: 'Order closed successfully!' });
-            getOrderDetail(this.id).then(response => { this.order = response.data; });
-          });
+      });
+    },
+    handleDeleteOrder() {
+      this.$confirm('Do you want to perform this delete operation?', 'Notice', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        const params = new URLSearchParams();
+        params.append("ids", [this.id]);
+        deleteOrder(params).then(() => {
+          this.$message({ message: 'Deleted successfully!', type: 'success', duration: 1000 });
+          this.$router.back();
         });
-      },
-      showMarkOrderDialog() {
-        this.markOrderDialogVisible = true;
-        this.markInfo.id = this.id;
-        this.closeOrder.note = null;
-      },
-      handleMarkOrder() {
-        this.$confirm('Do you want to add a note to the order?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          const params = new URLSearchParams();
-          params.append("id", this.markInfo.id);
-          params.append("note", this.markInfo.note);
-          params.append("status", this.order.status);
-          updateOrderNote(params).then(() => {
-            this.markOrderDialogVisible = false;
-            this.$message({ type: 'success', message: 'Order note added successfully!' });
-            getOrderDetail(this.id).then(response => { this.order = response.data; });
-          });
-        });
-      },
-      handleDeleteOrder() {
-        this.$confirm('Do you want to perform this delete operation?', 'Notice', {
-          confirmButtonText: 'Confirm',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          const params = new URLSearchParams();
-          params.append("ids", [this.id]);
-          deleteOrder(params).then(() => {
-            this.$message({ message: 'Deleted successfully!', type: 'success', duration: 1000 });
-            this.$router.back();
-          });
-        });
-      },
-      showLogisticsDialog() {
-        this.logisticsDialogVisible = true;
-      }
+      });
+    },
+    showLogisticsDialog() {
+      this.logisticsDialogVisible = true;
     }
-  };
+  }
+};
 </script>
 
 <style scoped>

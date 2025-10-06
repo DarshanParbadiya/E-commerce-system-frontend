@@ -21,7 +21,7 @@ export function parseTime(time, cFormat) {
   }
   const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
     let value = formatObj[key]
-    if (key === 'a') return ['一', '二', '三', '四', '五', '六', '日'][value - 1]
+    if (key === 'a') return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][value - 1]
     if (result.length > 0 && value < 10) {
       value = '0' + value
     }
@@ -38,17 +38,22 @@ export function formatTime(time, option) {
   const diff = (now - d) / 1000
 
   if (diff < 30) {
-    return '刚刚'
-  } else if (diff < 3600) { // less 1 hour
-    return Math.ceil(diff / 60) + '分钟前'
+    return 'just now'
+  } else if (diff < 3600) { // less than 1 hour
+    return Math.ceil(diff / 60) + ' minutes ago'
   } else if (diff < 3600 * 24) {
-    return Math.ceil(diff / 3600) + '小时前'
+    return Math.ceil(diff / 3600) + ' hours ago'
   } else if (diff < 3600 * 24 * 2) {
-    return '1天前'
+    return '1 day ago'
   }
   if (option) {
     return parseTime(time, option)
   } else {
-    return d.getMonth() + 1 + '月' + d.getDate() + '日' + d.getHours() + '时' + d.getMinutes() + '分'
+    return (
+      (d.getMonth() + 1) + ' month ' +
+      d.getDate() + ' day ' +
+      d.getHours() + ' hour ' +
+      d.getMinutes() + ' min'
+    )
   }
 }

@@ -8,7 +8,8 @@
         </p>
       </el-col>
     </el-row>
-
+    <p>
+      {{ $t('home.welcome.welcome') }}</p>
     <el-row :gutter="20">
       <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="service in services" :key="service.name">
         <el-card shadow="hover" class="service-card">
@@ -17,21 +18,11 @@
             <span class="card-title">{{ service.name }}</span>
           </div>
           <p class="card-desc">{{ service.description }}</p>
-          <el-button 
-            type="primary" 
-            icon="el-icon-link" 
-            size="mini"
-            @click="openLink(service.link)"
-          >
+          <el-button type="primary" icon="el-icon-link" size="mini" @click="openLink(service.link)">
             Open
           </el-button>
-          <el-button 
-            v-if="service.extraLink" 
-            type="success" 
-            icon="el-icon-document" 
-            size="mini"
-            @click="openLink(service.extraLink)"
-          >
+          <el-button v-if="service.extraLink" type="success" icon="el-icon-document" size="mini"
+            @click="openLink(service.extraLink)">
             Docs
           </el-button>
         </el-card>
@@ -43,44 +34,61 @@
 <script>
 export default {
   name: "ProjectDocsDashboard",
+
+
   data() {
+
+    const base = process.env.VUE_APP_BASE_URL;
+    const monitor = process.env.VUE_APP_MALL_MONITOR_PORT;
+    const portal = process.env.VUE_APP_MALL_PORTAL_PORT;
+    const gateway = process.env.VUE_APP_MALL_GATEWAY_PORT;
+    const admin = process.env.VUE_APP_MALL_ADMIN;
+    const auth = process.env.VUE_APP_MALL_AUTH_PORT;
+    const nacos = process.env.VUE_APP_NACOS_PORT;
+    const mq = process.env.VUE_APP_RABBITMQ_PORT;
     return {
       services: [
         {
           name: "Mall Monitor",
           description: "Spring Boot Admin dashboard for monitoring microservices.",
-          link: "http://vps.darshanparbadiya.site:8101/login#/",
+          link: `${base}:${monitor}/login#/`,
           icon: "monitor"
         },
         {
           name: "Mall Portal",
           description: "Swagger API documentation for the portal service.",
-          link: "http://vps.darshanparbadiya.site:8085/swagger-ui/index.html#/",
+          link: `${base}:${portal}/swagger-ui/index.html#/`,
+          icon: "document"
+        },
+        {
+          name: "Mall Admin",
+          description: "Swagger API documentation for the Admin service.",
+          link: `${base}:${admin}/swagger-ui/index.html#/`,
           icon: "document"
         },
         {
           name: "Mall Gateway",
           description: "Main gateway for all services.",
-          link: "http://vps.darshanparbadiya.site:8201",
-          extraLink: "http://vps.darshanparbadiya.site:8201/doc.html",
+          link: `${base}:${gateway}`,
+          extraLink: `${base}:${gateway}/doc.html`,
           icon: "connection"
         },
         {
           name: "Mall Auth",
           description: "Authentication service with Swagger API docs.",
-          link: "http://vps.darshanparbadiya.site:8401/swagger-ui/index.html#/",
+          link: `${base}:${auth}/swagger-ui/index.html#/`,
           icon: "lock"
         },
         {
           name: "Nacos Registry",
           description: "Configuration management center for microservices.",
-          link: "http://vps.darshanparbadiya.site:8848/nacos/",
+          link: `${base}:${nacos}/nacos/`,
           icon: "setting"
         },
         {
           name: "RabbitMQ",
           description: "Message queue management interface.",
-          link: "http://vps.darshanparbadiya.site:15672/",
+          link: `${base}:${mq}/`,
           icon: "message"
         }
       ]

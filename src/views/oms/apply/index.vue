@@ -79,7 +79,7 @@
           <template slot-scope="scope">{{scope.row.memberUsername}}</template>
         </el-table-column>
         <el-table-column label="Refund Amount" width="180" align="center">
-          <template slot-scope="scope">￥{{scope.row | formatReturnAmount}}</template>
+          <template slot-scope="scope">${{scope.row | formatReturnAmount}}</template>
         </el-table-column>
         <el-table-column label="Application Status" width="180" align="center">
           <template slot-scope="scope">{{scope.row.status | formatStatus}}</template>

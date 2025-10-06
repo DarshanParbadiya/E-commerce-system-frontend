@@ -17,7 +17,7 @@
           <template slot-scope="scope">NO.{{ scope.row.product.productSn }}</template>
         </el-table-column>
         <el-table-column label="Price" width="100" align="center">
-          <template slot-scope="scope">￥{{ scope.row.product.price }}</template>
+          <template slot-scope="scope">${{ scope.row.product.price }}</template>
         </el-table-column>
         <el-table-column label="Remaining Stock" width="100" align="center">
           <template slot-scope="scope">{{ scope.row.product.stock }}</template>
@@ -25,7 +25,7 @@
         <el-table-column label="Flash Sale Price" width="100" align="center">
           <template slot-scope="scope">
             <p v-if="scope.row.flashPromotionPrice !== null">
-              ￥{{ scope.row.flashPromotionPrice }}
+              ${{ scope.row.flashPromotionPrice }}
             </p>
           </template>
         </el-table-column>
@@ -68,7 +68,7 @@
           <template slot-scope="scope">NO.{{ scope.row.productSn }}</template>
         </el-table-column>
         <el-table-column label="Price" width="120" align="center">
-          <template slot-scope="scope">￥{{ scope.row.price }}</template>
+          <template slot-scope="scope">${{ scope.row.price }}</template>
         </el-table-column>
       </el-table>
       <div class="pagination-container">
@@ -92,11 +92,11 @@
           <span>NO.{{ flashProductRelation.product.productSn }}</span>
         </el-form-item>
         <el-form-item label="Price:">
-          <span>￥{{ flashProductRelation.product.price }}</span>
+          <span>${{ flashProductRelation.product.price }}</span>
         </el-form-item>
         <el-form-item label="Flash Sale Price:">
           <el-input v-model="flashProductRelation.flashPromotionPrice" class="input-width">
-            <template slot="prepend">￥</template>
+            <template slot="prepend">$</template>
           </el-input>
         </el-form-item>
         <el-form-item label="Remaining Stock:">

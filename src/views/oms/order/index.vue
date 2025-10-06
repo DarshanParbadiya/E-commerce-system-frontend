@@ -4,17 +4,10 @@
       <div>
         <i class="el-icon-search"></i>
         <span>Filter & Search</span>
-        <el-button
-          style="float:right"
-          type="primary"
-          @click="handleSearchList()"
-          size="small">
+        <el-button style="float:right" type="primary" @click="handleSearchList()" size="small">
           Search
         </el-button>
-        <el-button
-          style="float:right;margin-right: 15px"
-          @click="handleResetSearch()"
-          size="small">
+        <el-button style="float:right;margin-right: 15px" @click="handleResetSearch()" size="small">
           Reset
         </el-button>
       </div>
@@ -24,41 +17,29 @@
             <el-input v-model="listQuery.orderSn" class="input-width" placeholder="Order Number"></el-input>
           </el-form-item>
           <el-form-item label="Receiver:">
-            <el-input v-model="listQuery.receiverKeyword" class="input-width" placeholder="Receiver Name / Phone"></el-input>
+            <el-input v-model="listQuery.receiverKeyword" class="input-width"
+              placeholder="Receiver Name / Phone"></el-input>
           </el-form-item>
           <el-form-item label="Submission Date:">
-            <el-date-picker
-              class="input-width"
-              v-model="listQuery.createTime"
-              value-format="yyyy-MM-dd"
-              type="date"
+            <el-date-picker class="input-width" v-model="listQuery.createTime" value-format="yyyy-MM-dd" type="date"
               placeholder="Select Date">
             </el-date-picker>
           </el-form-item>
           <el-form-item label="Order Status:">
             <el-select v-model="listQuery.status" class="input-width" placeholder="All" clearable>
-              <el-option v-for="item in statusOptions"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value">
+              <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="Order Type:">
             <el-select v-model="listQuery.orderType" class="input-width" placeholder="All" clearable>
-              <el-option v-for="item in orderTypeOptions"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value">
+              <el-option v-for="item in orderTypeOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="Order Source:">
             <el-select v-model="listQuery.sourceType" class="input-width" placeholder="All" clearable>
-              <el-option v-for="item in sourceTypeOptions"
-                         :key="item.value"
-                         :label="item.label"
-                         :value="item.value">
+              <el-option v-for="item in sourceTypeOptions" :key="item.value" :label="item.label" :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -72,109 +53,70 @@
     </el-card>
 
     <div class="table-container">
-      <el-table ref="orderTable"
-                :data="list"
-                style="width: 100%;"
-                @selection-change="handleSelectionChange"
-                v-loading="listLoading" border>
+      <el-table ref="orderTable" :data="list" style="width: 100%;" @selection-change="handleSelectionChange"
+        v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
         <el-table-column label="ID" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{ scope.row.id }}</template>
         </el-table-column>
         <el-table-column label="Order Number" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
+          <template slot-scope="scope">{{ scope.row.orderSn }}</template>
         </el-table-column>
         <el-table-column label="Submission Time" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
+          <template slot-scope="scope">{{ scope.row.createTime | formatCreateTime }}</template>
         </el-table-column>
         <el-table-column label="User Account" align="center">
-          <template slot-scope="scope">{{scope.row.memberUsername}}</template>
+          <template slot-scope="scope">{{ scope.row.memberUsername }}</template>
         </el-table-column>
         <el-table-column label="Order Amount" width="120" align="center">
-          <template slot-scope="scope">￥{{scope.row.totalAmount}}</template>
+          <template slot-scope="scope">${{ scope.row.totalAmount }}</template>
         </el-table-column>
         <el-table-column label="Payment Method" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.payType | formatPayType}}</template>
+          <template slot-scope="scope">{{ scope.row.payType | formatPayType }}</template>
         </el-table-column>
         <el-table-column label="Order Source" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.sourceType | formatSourceType}}</template>
+          <template slot-scope="scope">{{ scope.row.sourceType | formatSourceType }}</template>
         </el-table-column>
         <el-table-column label="Order Status" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.status | formatStatus}}</template>
+          <template slot-scope="scope">{{ scope.row.status | formatStatus }}</template>
         </el-table-column>
         <el-table-column label="Actions" width="200" align="center">
           <template slot-scope="scope">
-            <el-button
-              size="mini"
-              @click="handleViewOrder(scope.$index, scope.row)"
-            >View Order</el-button>
-            <el-button
-              size="mini"
-              @click="handleCloseOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===0">Close Order</el-button>
-            <el-button
-              size="mini"
-              @click="handleDeliveryOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===1">Deliver Order</el-button>
-            <el-button
-              size="mini"
-              @click="handleViewLogistics(scope.$index, scope.row)"
-              v-show="scope.row.status===2 || scope.row.status===3">Track Order</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDeleteOrder(scope.$index, scope.row)"
-              v-show="scope.row.status===4">Delete Order</el-button>
+            <el-button size="mini" @click="handleViewOrder(scope.$index, scope.row)">View Order</el-button>
+            <el-button size="mini" @click="handleCloseOrder(scope.$index, scope.row)"
+              v-show="scope.row.status === 0">Close Order</el-button>
+            <el-button size="mini" @click="handleDeliveryOrder(scope.$index, scope.row)"
+              v-show="scope.row.status === 1">Deliver Order</el-button>
+            <el-button size="mini" @click="handleViewLogistics(scope.$index, scope.row)"
+              v-show="scope.row.status === 2 || scope.row.status === 3">Track Order</el-button>
+            <el-button size="mini" type="danger" @click="handleDeleteOrder(scope.$index, scope.row)"
+              v-show="scope.row.status === 4">Delete Order</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
 
     <div class="batch-operate-container">
-      <el-select
-        size="small"
-        v-model="operateType" placeholder="Batch Operation">
-        <el-option
-          v-for="item in operateOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
+      <el-select size="small" v-model="operateType" placeholder="Batch Operation">
+        <el-option v-for="item in operateOptions" :key="item.value" :label="item.label" :value="item.value">
         </el-option>
       </el-select>
-      <el-button
-        style="margin-left: 20px"
-        class="search-button"
-        @click="handleBatchOperate()"
-        type="primary"
+      <el-button style="margin-left: 20px" class="search-button" @click="handleBatchOperate()" type="primary"
         size="small">
         Confirm
       </el-button>
     </div>
 
     <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes, prev, pager, next, jumper"
-        :current-page.sync="listQuery.pageNum"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :total="total">
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        layout="total, sizes, prev, pager, next, jumper" :current-page.sync="listQuery.pageNum"
+        :page-size="listQuery.pageSize" :page-sizes="[5, 10, 15]" :total="total">
       </el-pagination>
     </div>
 
-    <el-dialog
-      title="Close Order"
-      :visible.sync="closeOrder.dialogVisible"
-      width="30%">
+    <el-dialog title="Close Order" :visible.sync="closeOrder.dialogVisible" width="30%">
       <span style="vertical-align: top">Remarks:</span>
-      <el-input
-        style="width: 80%"
-        type="textarea"
-        :rows="5"
-        placeholder="Enter content"
-        v-model="closeOrder.content">
+      <el-input style="width: 80%" type="textarea" :rows="5" placeholder="Enter content" v-model="closeOrder.content">
       </el-input>
       <span slot="footer" class="dialog-footer">
         <el-button @click="closeOrder.dialogVisible = false">Cancel</el-button>
@@ -257,7 +199,7 @@ export default {
       return value === 1 ? 'APP Order' : 'PC Order';
     },
     formatStatus(value) {
-      switch(value) {
+      switch (value) {
         case 1: return 'Pending Shipment';
         case 2: return 'Shipped';
         case 3: return 'Completed';
@@ -279,14 +221,14 @@ export default {
       this.multipleSelection = val;
     },
     handleViewOrder(index, row) {
-      this.$router.push({ path:'/oms/orderDetail', query:{id: row.id} });
+      this.$router.push({ path: '/oms/orderDetail', query: { id: row.id } });
     },
     handleCloseOrder(index, row) {
       this.closeOrder.dialogVisible = true;
       this.closeOrder.orderIds = [row.id];
     },
     handleDeliveryOrder(index, row) {
-      this.$router.push({ path:'/oms/deliverOrderList', query:{ list: [this.covertOrder(row)] } });
+      this.$router.push({ path: '/oms/deliverOrderList', query: { list: [this.covertOrder(row)] } });
     },
     handleViewLogistics(index, row) {
       this.logisticsDialogVisible = true;
@@ -306,7 +248,7 @@ export default {
           this.$message({ message: 'No deliverable orders selected', type: 'warning', duration: 1000 });
           return;
         }
-        this.$router.push({ path:'/oms/deliverOrderList', query:{ list } });
+        this.$router.push({ path: '/oms/deliverOrderList', query: { list } });
       } else if (this.operateType === 2) {
         // Close orders
         this.closeOrder.orderIds = this.multipleSelection.map(item => item.id);
